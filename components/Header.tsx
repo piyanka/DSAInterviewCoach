@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 type HeaderProps = {
   onReset: () => void;
   disabled?: boolean;
@@ -16,11 +18,11 @@ export function Header({
   return (
     <header className="sticky top-0 z-10 border-b border-[var(--surface-border)] bg-[var(--surface-bg)] px-4 py-3 backdrop-blur sm:px-6">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
-        <div>
+        <Link href="/" className="transition hover:opacity-70">
           <h1 className="text-[1.02rem] font-medium tracking-[-0.04em] text-slate-900">
             DSA Interview Coach
           </h1>
-        </div>
+        </Link>
 
         <div className="flex shrink-0 flex-wrap items-center gap-2">
           {timer ? (

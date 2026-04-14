@@ -1,319 +1,116 @@
-"use client";
+import Link from "next/link";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { ChatInput } from "@/components/ChatInput";
-import { ChatMessage } from "@/components/ChatMessage";
-import { Header } from "@/components/Header";
-import { SuggestionButtons } from "@/components/SuggestionButtons";
-import { type StriverQuestion } from "@/data/striverQuestions";
-
-type ChatRole = "user" | "assistant" | "system";
-
-type UiMessage = {
-  id: string;
-  role: ChatRole;
-  content: string;
-};
-
-type ChatMode = "mockInterview" | "normalChat";
-type InterviewStage =
-  | "approach"
-  | "timeComplexity"
-  | "spaceComplexity"
-  | "optimization"
-  | "complete"
-  | "solution";
-
-type InterviewState = {
-  stage: InterviewStage;
-  hintsUsed: number;
-};
-
-function inferTopicFromSuggestion(label: string): string | undefined {
-  if (label.includes("Array")) {
-    return "Arrays";
-  }
-
-  if (label.includes("Tree")) {
-    return "Binary Trees";
-  }
-
-  if (label.includes("Dynamic Programming")) {
-    return "Dynamic Programming";
-  }
-
-  return undefined;
-}
-
-function makeId() {
-  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-}
-
-const MOCK_INTERVIEW_DURATION_SECONDS = 45 * 60;
-const MOCK_INTERVIEW_WARNING_SECONDS = 5 * 60;
-
-function formatRemainingTime(totalSeconds: number) {
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-}
-
-export default function HomePage() {
-  const [messages, setMessages] = useState<UiMessage[]>([]);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [mode, setMode] = useState<ChatMode>("normalChat");
-  const [selectedTopic, setSelectedTopic] = useState<string | undefined>(undefined);
-  const [currentQuestion, setCurrentQuestion] = useState<StriverQuestion | null>(null);
-  const [interviewState, setInterviewState] = useState<InterviewState | null>(null);
-  const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
-  const [interviewExpired, setInterviewExpired] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const expiryAnnouncedRef = useRef(false);
-
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isLoading]);
-
-
-  useEffect(() => {
-    if (mode !== "mockInterview" || timeRemaining === null || interviewExpired) {
-      return;
-    }
-
-    const timer = window.setInterval(() => {
-      setTimeRemaining((previous) => {
-        if (previous === null) {
-          return previous;
-        }
-
-        if (previous <= 1) {
-          window.clearInterval(timer);
-          return 0;
-        }
-
-        return previous - 1;
-      });
-    }, 1000);
-
-    return () => window.clearInterval(timer);
-  }, [mode, timeRemaining, interviewExpired]);
-
-  useEffect(() => {
-    if (mode !== "mockInterview" || timeRemaining !== 0 || expiryAnnouncedRef.current) {
-      return;
-    }
-
-    expiryAnnouncedRef.current = true;
-    setInterviewExpired(true);
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: makeId(),
-        role: "system",
-        content:
-          "Your 45-minute mock interview has ended. Reset chat to start a fresh interview."
-      }
-    ]);
-  }, [mode, timeRemaining]);
-
-  const chatHistory = useMemo(
-    () =>
-      messages
-        .filter((message) => message.role !== "system")
-        .map((message) => ({
-          role: message.role === "user" ? "user" : "assistant",
-          content: message.content
-        })),
-    [messages]
-  );
-
-  async function sendMessage(message: string, nextMode = mode, nextTopic = selectedTopic) {
-    const trimmedMessage = message.trim();
-    if (!trimmedMessage || (nextMode === "mockInterview" && interviewExpired)) {
-      return;
-    }
-
-    const userMessage: UiMessage = {
-      id: makeId(),
-      role: "user",
-      content: trimmedMessage
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setIsLoading(true);
-
-    try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          message: trimmedMessage,
-          mode: nextMode,
-          selectedTopic: nextTopic,
-          currentQuestion,
-          interviewState,
-          history: [...chatHistory, { role: "user", content: trimmedMessage }]
-        })
-      });
-
-      const contentType = response.headers.get("content-type") || "";
-      const payloadText = await response.text();
-
-      if (!contentType.includes("application/json")) {
-        throw new Error("The server returned an unexpected response. Please restart the app and try again.");
-      }
-
-      const data = JSON.parse(payloadText) as {
-        reply?: string;
-        error?: string;
-        question?: StriverQuestion | null;
-        interviewState?: InterviewState | null;
-      };
-
-      const replyText = data.reply;
-
-      if (!response.ok || !replyText) {
-        throw new Error(data.error || "Something went wrong. Please try again.");
-      }
-
-      setCurrentQuestion(data.question ?? null);
-      setInterviewState(data.interviewState ?? null);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: makeId(),
-          role: "assistant",
-          content: replyText
-        }
-      ]);
-    } catch (error) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: makeId(),
-          role: "system",
-          content:
-            error instanceof Error
-              ? error.message
-              : "Something went wrong. Please try again."
-        }
-      ]);
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  function handleSuggestion(label: string) {
-    const nextMode: ChatMode = "mockInterview";
-    const nextTopic = inferTopicFromSuggestion(label);
-
-    expiryAnnouncedRef.current = false;
-    setMode(nextMode);
-    setSelectedTopic(nextTopic);
-    setCurrentQuestion(null);
-    setInterviewExpired(false);
-    setTimeRemaining(MOCK_INTERVIEW_DURATION_SECONDS);
-    setInterviewState({
-      stage: "approach",
-      hintsUsed: 0
-    });
-
-    void sendMessage(label, nextMode, nextTopic);
-  }
-
-  function handleReset() {
-    expiryAnnouncedRef.current = false;
-    setMessages([]);
-    setInput("");
-    setIsLoading(false);
-    setMode("normalChat");
-    setSelectedTopic(undefined);
-    setCurrentQuestion(null);
-    setInterviewState(null);
-    setTimeRemaining(null);
-    setInterviewExpired(false);
-  }
-
-  const emptyState = (
-    <section className="relative flex flex-1 items-center justify-center overflow-hidden px-6 py-16">
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[24rem] w-[24rem] -translate-x-[140%] -translate-y-[58%] rounded-full bg-indigo-200/35 blur-3xl" />
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[18rem] w-[18rem] translate-x-[85%] -translate-y-[12%] rounded-full bg-sky-200/45 blur-3xl" />
-
-      <div className="relative flex w-full max-w-3xl flex-col items-center gap-7 rounded-[32px] border border-[var(--shell-border)] bg-[var(--shell-bg)] px-8 py-12 text-center shadow-[0_28px_80px_rgba(99,102,241,0.14)] backdrop-blur-xl sm:px-12 sm:py-14">
-        <div className="text-4xl leading-none">🧠</div>
-        <h2 className="text-[3rem] font-bold tracking-[-0.06em] text-slate-900 sm:text-[3.2rem]">
-          DSA Interview Coach
-        </h2>
-        <p className="max-w-2xl text-[1rem] leading-8 text-slate-500">
-          Practice Data Structures and Algorithms interviews with an AI interviewer
-          trained on Striver SDE Sheet questions.
-        </p>
-        <SuggestionButtons onSelect={handleSuggestion} disabled={isLoading} />
-      </div>
-    </section>
-  );
-
-  const chatView = (
-    <section className="flex flex-1 flex-col overflow-hidden bg-transparent">
-      <div
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto px-4 pt-8 pb-12 scroll-smooth sm:px-6"
-      >
-        <div className="mx-auto max-w-3xl space-y-6">
-          {messages.map((message) => (
-            <ChatMessage
-              key={message.id}
-              role={message.role}
-              content={message.content}
-            />
-          ))}
-
-          {isLoading ? (
-            <ChatMessage role="assistant" content="" loading />
-          ) : null}
-          
-          <div ref={messagesEndRef} className="h-4" />
-        </div>
-      </div>
-    </section>
-  );
-
-
+export default function LandingPage() {
   return (
-    <main className="h-[100dvh] overflow-hidden bg-transparent">
-      <div className="flex h-full flex-col">
-        {messages.length > 0 ? (
-          <Header
-            onReset={handleReset}
-            disabled={isLoading}
-            timer={mode === "mockInterview" && timeRemaining !== null ? formatRemainingTime(timeRemaining) : null}
-            timerWarning={timeRemaining !== null && timeRemaining <= MOCK_INTERVIEW_WARNING_SECONDS}
-            showReset={messages.length > 0}
-          />
-        ) : null}
-
-        {messages.length === 0 ? emptyState : chatView}
-
-        {messages.length > 0 ? (
-          <div className="flex-none border-t border-[var(--surface-border)] bg-[var(--surface-bg)] px-4 py-4 backdrop-blur sm:px-6">
-            <div className="mx-auto max-w-2xl">
-              <ChatInput
-                value={input}
-                onChange={setInput}
-                onSubmit={() => void sendMessage(input)}
-                disabled={isLoading || interviewExpired}
-              />
-            </div>
+    <div className="flex min-h-screen flex-col bg-transparent">
+      {/* Navbar */}
+      <nav className="sticky top-0 z-50 border-b border-white/20 bg-white/70 px-6 py-4 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">🧠</span>
+            <span className="text-xl font-bold tracking-tight text-slate-900">
+              DSA Coach
+            </span>
           </div>
-        ) : null}
-      </div>
-    </main>
-  );
+          <div className="hidden items-center gap-8 md:flex">
+            <a href="#features" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition">Features</a>
+            <a href="#how-it-works" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition">How it Works</a>
+            <a href="#" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition">About</a>
+          </div>
+          <Link
+            href="/interview"
+            className="rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-200 transition hover:bg-indigo-700 hover:shadow-indigo-300"
+          >
+            Get Started
+          </Link>
+        </div>
+      </nav>
 
+      {/* Hero Section */}
+      <section className="relative flex flex-1 items-center justify-center overflow-hidden px-6 py-24 text-center md:py-32">
+        <div className="relative z-10 mx-auto max-w-4xl">
+          <div className="mb-8 inline-flex items-center rounded-full border border-indigo-100 bg-indigo-50/50 px-4 py-1.5 text-sm font-medium text-indigo-700">
+            <span className="mr-2">✨</span> AI-Powered Interview Prep
+          </div>
+          <h1 className="mb-6 text-5xl font-extrabold tracking-tight text-slate-900 sm:text-7xl">
+            Crack your <span className="text-indigo-600">DSA Interview</span> with Confidence
+          </h1>
+          <p className="mb-10 text-lg leading-relaxed text-slate-600 sm:text-xl">
+            Interactive AI coaching trained on the Striver SDE Sheet. Practice real scenarios, get instant feedback, and master the toughest problems.
+          </p>
+          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Link
+              href="/interview"
+              className="group relative flex h-14 items-center justify-center overflow-hidden rounded-2xl bg-indigo-600 px-8 font-bold text-white transition-all hover:bg-indigo-700"
+            >
+              Start Free Mock Interview
+              <span className="ml-2 transition-transform group-hover:translate-x-1">→</span>
+            </Link>
+            <a
+              href="#features"
+              className="flex h-14 items-center justify-center rounded-2xl border border-slate-200 bg-white px-8 font-bold text-slate-700 transition hover:bg-slate-50"
+            >
+              Explore Features
+            </a>
+          </div>
+        </div>
+
+        {/* Abstract shapes for premium look */}
+        <div className="pointer-events-none absolute -left-20 top-40 h-96 w-96 rounded-full bg-indigo-400/10 blur-[100px]" />
+        <div className="pointer-events-none absolute -right-20 bottom-20 h-96 w-96 rounded-full bg-blue-400/10 blur-[100px]" />
+      </section>
+
+      {/* Features Section */}
+      <section id="features" className="bg-slate-50/50 py-24 px-6 backdrop-blur-sm">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-16 text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Everything you need to succeed</h2>
+          </div>
+          <div className="grid gap-10 md:grid-cols-3">
+            {[
+              {
+                title: "AI Interviewer",
+                desc: "Get grilled by an AI that understands edge cases, time complexity, and optimization.",
+                icon: "🤖"
+              },
+              {
+                title: "Striver SDE Sheet",
+                desc: "Built-in support for the most popular DSA roadmap. Practice curriculum-based questions.",
+                icon: "📜"
+              },
+              {
+                title: "Real-time Feedback",
+                desc: "Don't just solve—learn. Get hints and explanations as you navigate through the interview.",
+                icon: "⚡"
+              }
+            ].map((feature, i) => (
+              <div key={i} className="group rounded-3xl border border-white bg-white/50 p-8 shadow-sm transition hover:shadow-xl hover:-translate-y-1">
+                <div className="mb-4 text-4xl">{feature.icon}</div>
+                <h3 className="mb-3 text-xl font-bold text-slate-900">{feature.title}</h3>
+                <p className="text-slate-600 leading-relaxed">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-slate-200 bg-white py-12 px-6">
+        <div className="mx-auto max-w-7xl flex flex-col items-center justify-between gap-6 md:flex-row">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">🧠</span>
+            <span className="font-bold text-slate-900">DSA Coach</span>
+          </div>
+          <p className="text-sm text-slate-500">
+            © 2024 DSA Interview Coach. Build with ❤️ for developers.
+          </p>
+          <div className="flex gap-6 text-sm font-medium text-slate-600">
+            <a href="#" className="hover:text-indigo-600">Privacy</a>
+            <a href="#" className="hover:text-indigo-600">Terms</a>
+            <a href="#" className="hover:text-indigo-600">Contact</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
 }
