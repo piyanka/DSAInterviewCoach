@@ -126,3 +126,11 @@ http://localhost:3000
 ## Contributing
 
 Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before contributing.
+
+## 📜 Code of Conduct
+
+We are committed to maintaining a welcoming and inclusive community.
+
+Please read our Code of Conduct before contributing:
+
+[Code of Conduct](./CODE_OF_CONDUCT.md)
