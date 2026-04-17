@@ -121,3 +121,8 @@ http://localhost:3000
 
 <!-- - The mock interview route is implemented in [/Users/priyanka/Documents/Projects/ThinklyLab/app/api/chat/route.ts](./app/api/chat/route.ts). -->
 - Gemini responses are generated with `GEMINI_MODEL` or default to `gemini-2.5-flash`.
+
+
+## Contributing
+
+Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before contributing.
