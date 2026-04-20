@@ -1,147 +1,141 @@
-# 🤝 Contributing to DSA Interview Coach
+# Contributing to DSA Interview Coach
 
-Thank you for your interest in contributing! 🎉  
-This project aims to make DSA interview practice more interactive and accessible. We welcome contributions from everyone.
+Thank you for your interest in contributing to DSA Interview Coach. This guide explains how to get the project running locally, how to submit changes, and what to include in a pull request.
 
----
+## Getting Started
 
-## 🚀 Getting Started
+### 1. Fork and clone the repository
 
-Follow these steps to run the project locally:
+Fork the repository on GitHub, then clone your fork locally:
 
-### 1. Fork the Repository
-Click the **Fork** button on GitHub.
-
-### 2. Clone the Repository
 ```bash
-git clone https://github.com/your-username/dsa-interview-coach.git
-cd dsa-interview-coach
+git clone https://github.com/your-username/DSAInterviewCoach.git
+cd DSAInterviewCoach
+```
 
-### 3. Install Dependencies
+### 2. Install dependencies
+
 ```bash
 npm install
+```
 
-### 4. Setup Environment Variables
+### 3. Configure environment variables
 
-Create a `.env.local` file:
+Create a local environment file:
 
 ```bash
 cp .env.local.example .env.local
+```
 
-Add your Gemini API key:
+Add your Gemini configuration to `.env.local`:
+
+```bash
 GEMINI_API_KEY=your_actual_key_here
 GEMINI_MODEL=gemini-2.5-flash
+```
 
-### 5. Run the Project
+### 4. Start the development server
+
 ```bash
 npm run dev
+```
 
-## 🌿 Contribution Workflow
+Open `http://localhost:3000` in your browser.
 
-### 1. Create a new branch:(this will also switch you to the new branch):
+## Contribution Workflow
+
+### 1. Create a branch
+
+Create a feature or fix branch from `main`:
+
 ```bash
 git checkout -b feature/your-feature-name
+```
 
 ### 2. Make your changes
 
-### 3. Stage your changes:
+Keep changes focused and aligned with the existing project structure and style.
+
+### 3. Review your work
+
+Before opening a pull request, make sure the app still runs locally and verify the behavior you changed.
+
+### 4. Commit your changes
+
+Stage and commit with a clear message:
+
 ```bash
 git add .
-
-### 4. Commit your changes:
-```bash
 git commit -m "feat: short description"
+```
 
-### 5. Push to your branch:
+### 5. Push your branch
+
 ```bash
 git push origin feature/your-feature-name
+```
 
+### 6. Open a pull request
 
-### 6. Open a Pull Request (PR)
-Steps to Open a Pull Request
+When opening a PR, please include:
 
-- Go to your forked repository on GitHub  
-- Click **"Compare & pull request"** button  
-  *(or go to the Pull Requests tab → New Pull Request)*  
+- A clear title
+- A short summary of what changed
+- Why the change was needed
+- Screenshots or recordings for UI updates, when relevant
+- Related issue references, such as `Closes #123`
 
-- Select:
-  - **Base repository:** original project repository  
-  - **Base branch:** `main`  
-  - **Head repository:** your fork  
-  - **Compare branch:** your feature branch  
+## Coding Guidelines
 
-- Add a clear title and description:
-  - What changes you made  
-  - Why they are needed  
-  - Screenshots
+- Use TypeScript where applicable.
+- Follow the existing folder structure and naming conventions.
+- Keep components small, readable, and reusable.
+- Prefer clear, maintainable code over clever shortcuts.
+- Add comments only when they help explain non-obvious logic.
+- Keep Tailwind usage consistent with the rest of the project.
 
-Closes: #issue-number
+## Commit Message Guidelines
 
-## After Submitting
-- Wait for review
-- Make changes if requested
-- Once approved, your PR will be merged 🎉
+Use concise commit messages in this format:
 
-
-## 🧑‍💻 Coding Standards & Best Practices
-
-- Use TypeScript where applicable  
-- Follow existing folder structure  
-- Write clean, readable, and modular code  
-- Keep components small and reusable  
-- Use consistent Tailwind CSS styling  
-- Add comments only where necessary  
-
----
-
-## 📝 Commit Message Guidelines
-
-Use this format:
 ```bash
-git commit -m "feat: short description"
+type: short description
+```
 
+Common types:
 
-### Common Types:
+- `feat`: new feature
+- `fix`: bug fix
+- `docs`: documentation updates
+- `refactor`: code improvements
+- `style`: formatting or styling changes
 
-- `feat:` → New feature  
-- `fix:` → Bug fix  
-- `docs:` → Documentation updates  
-- `refactor:` → Code improvements  
-- `style:` → Formatting changes  
+Examples:
 
-### Example:
-
+```text
 feat: add interview timer
 fix: handle API error state
+docs: improve setup instructions
+```
 
----
-
-## 🐛 Reporting Issues
+## Reporting Issues
 
 When reporting a bug, please include:
 
-- Clear description  
-- Steps to reproduce  
-- Expected vs actual behavior  
-- Screenshots (if applicable)  
+- A clear description of the problem
+- Steps to reproduce it
+- Expected behavior
+- Actual behavior
+- Screenshots, logs, or recordings if they help explain the issue
 
----
+## Suggesting Features
 
+When suggesting a feature, please include:
 
+- A short description of the idea
+- Why it would be useful
+- Any examples, references, or rough UX notes
 
-## 💡 Feature Requests
+## Final Notes
 
-To request a feature, include:
-
-- Feature description  
-- Why it is useful  
-- Optional examples or references  
-
----
-
-## 🙌 Final Note
-
-We welcome beginners and experienced developers alike.  
-Feel free to ask questions, suggest improvements, and collaborate.
-
-Happy Coding 🚀
+Contributions are appreciated. If you're unsure about a change, feel free to open an issue or submit a draft pull request to start the discussion.
