@@ -125,4 +125,4 @@ http://localhost:3000
 
 ## Contributing
 
-Please read the [contribution guide](./CONTRIBUTING.md) before contributing.
+Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before contributing.
