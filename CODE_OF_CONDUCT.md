@@ -1,7 +1,6 @@
 # 🤝 Code of Conduct
 
 ## Our Pledge
-
 We pledge to make participation in this project a harassment-free experience for everyone. We aim to create a welcoming, respectful, and inclusive community for all contributors.
 
 ---
@@ -26,7 +25,6 @@ Examples of unacceptable behavior:
 ---
 
 ## Our Responsibilities
-
 Maintainers are responsible for ensuring a positive environment and may take action against unacceptable behavior.
 
 They can remove, edit, or reject contributions that violate this Code of Conduct.
@@ -34,15 +32,12 @@ They can remove, edit, or reject contributions that violate this Code of Conduct
 ---
 
 ## Scope
-
 This Code of Conduct applies to all project spaces, including issues, pull requests, discussions, and any related communication.
 
 ---
 
 ## Enforcement
-
 Unacceptable behavior may be reported to the maintainers.
-
 All reports will be reviewed fairly and promptly.
 
 Actions may include:
@@ -54,6 +49,5 @@ Actions may include:
 ---
 
 ## Attribution
-
 Adapted from Contributor Covenant  
 https://www.contributor-covenant.org/
