@@ -84,11 +84,29 @@ export default function HomePage() {
       const savedExpired = localStorage.getItem("dsa_chat_expired");
       const savedEndTime = localStorage.getItem("dsa_chat_end_time");
 
-      if (savedMessages) setMessages(JSON.parse(savedMessages));
+      if (savedMessages) {
+        try {
+          setMessages(JSON.parse(savedMessages));
+        } catch {
+          localStorage.removeItem("dsa_chat_messages");
+        }
+      }
       if (savedMode) setMode(savedMode);
       if (savedTopic && savedTopic !== "undefined") setSelectedTopic(savedTopic);
-      if (savedQuestion) setCurrentQuestion(JSON.parse(savedQuestion));
-      if (savedState) setInterviewState(JSON.parse(savedState));
+      if (savedQuestion) {
+        try {
+          setCurrentQuestion(JSON.parse(savedQuestion));
+        } catch {
+          localStorage.removeItem("dsa_chat_question");
+        }
+      }
+      if (savedState) {
+        try {
+          setInterviewState(JSON.parse(savedState));
+        } catch {
+          localStorage.removeItem("dsa_chat_state");
+        }
+      }
       
       const isExpired = savedExpired === "true";
       setInterviewExpired(isExpired);
