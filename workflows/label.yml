@@ -1,0 +1,58 @@
+name: Auto Label NSOC Issues
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  add-label:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Normalize and add NSOC label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const targetLabel = "NSOC'26";
+
+            const normalize = (str) => {
+              return str
+                .toLowerCase()
+                .replace(/[^a-z0-9]/g, ""); // remove spaces, quotes, etc.
+            };
+
+            const normalizedTarget = normalize(targetLabel);
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+
+            // Fetch all repo labels
+            const { data: labels } = await github.rest.issues.listLabelsForRepo({
+              owner,
+              repo,
+              per_page: 100,
+            });
+
+            // Find matching label (case-insensitive + symbol-insensitive)
+            let existingLabel = labels.find(label => {
+              return normalize(label.name) === normalizedTarget;
+            });
+
+            // If no similar label exists, create one
+            if (!existingLabel) {
+              const created = await github.rest.issues.createLabel({
+                owner,
+                repo,
+                name: targetLabel,
+                color: "0E8A16",
+              });
+              existingLabel = created.data;
+            }
+
+            // Add the matched or created label
+            await github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number,
+              labels: [existingLabel.name],
+            });
