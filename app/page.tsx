@@ -84,30 +84,18 @@ export default function HomePage() {
       const savedExpired = localStorage.getItem("dsa_chat_expired");
       const savedEndTime = localStorage.getItem("dsa_chat_end_time");
 
-      if (savedMessages) {
-        try {
-          setMessages(JSON.parse(savedMessages));
-        } catch {
-          localStorage.removeItem("dsa_chat_messages");
-        }
-      }
+      // Parse all JSON up front — if any parse fails the catch clears everything
+      // and we start fresh, avoiding partially-restored inconsistent state.
+      const parsedMessages: UiMessage[] | null = savedMessages ? JSON.parse(savedMessages) : null;
+      const parsedQuestion: StriverQuestion | null = savedQuestion ? JSON.parse(savedQuestion) : null;
+      const parsedState: InterviewState | null = savedState ? JSON.parse(savedState) : null;
+
+      if (parsedMessages) setMessages(parsedMessages);
       if (savedMode) setMode(savedMode);
       if (savedTopic && savedTopic !== "undefined") setSelectedTopic(savedTopic);
-      if (savedQuestion) {
-        try {
-          setCurrentQuestion(JSON.parse(savedQuestion));
-        } catch {
-          localStorage.removeItem("dsa_chat_question");
-        }
-      }
-      if (savedState) {
-        try {
-          setInterviewState(JSON.parse(savedState));
-        } catch {
-          localStorage.removeItem("dsa_chat_state");
-        }
-      }
-      
+      if (parsedQuestion) setCurrentQuestion(parsedQuestion);
+      if (parsedState) setInterviewState(parsedState);
+
       const isExpired = savedExpired === "true";
       setInterviewExpired(isExpired);
       if (isExpired) expiryAnnouncedRef.current = true;
@@ -124,7 +112,8 @@ export default function HomePage() {
         }
       }
     } catch (e) {
-      console.error("Failed to load session:", e);
+      console.error("Failed to load session, clearing corrupted data:", e);
+      localStorage.clear();
     } finally {
       setHasHydrated(true);
     }
