@@ -197,25 +197,25 @@ export function LandingPage({ onSelectSuggestion, isLoading }: LandingPageProps)
             <div className="space-y-4">
               <h4 className="text-xs font-black uppercase tracking-widest text-slate-900">Platform</h4>
               <ul className="space-y-2 text-sm font-semibold text-slate-500">
-                <li><a href="#" className="hover:text-indigo-600">Pricing</a></li>
-                <li><a href="#" className="hover:text-indigo-600">Curriculum</a></li>
-                <li><a href="#" className="hover:text-indigo-600">API</a></li>
+                <li><a href="/pricing" className="hover:text-indigo-600">Pricing</a></li>
+                <li><a href="/curriculum" className="hover:text-indigo-600">Curriculum</a></li>
+                <li><a href="/api-info" className="hover:text-indigo-600">API</a></li>
               </ul>
             </div>
             <div className="space-y-4">
               <h4 className="text-xs font-black uppercase tracking-widest text-slate-900">Resources</h4>
               <ul className="space-y-2 text-sm font-semibold text-slate-500">
-                <li><a href="#" className="hover:text-indigo-600">Documentation</a></li>
-                <li><a href="#" className="hover:text-indigo-600">SDE Sheet</a></li>
-                <li><a href="#" className="hover:text-indigo-600">Blog</a></li>
+                <li><a href="/documentation" className="hover:text-indigo-600">Documentation</a></li>
+                <li><a href="/sde-sheet" className="hover:text-indigo-600">SDE Sheet</a></li>
+                <li><a href="/blog" className="hover:text-indigo-600">Blog</a></li>
               </ul>
             </div>
             <div className="space-y-4">
               <h4 className="text-xs font-black uppercase tracking-widest text-slate-900">Social</h4>
               <ul className="space-y-2 text-sm font-semibold text-slate-500">
-                <li><a href="#" className="hover:text-indigo-600">Twitter</a></li>
-                <li><a href="#" className="hover:text-indigo-600">GitHub</a></li>
-                <li><a href="#" className="hover:text-indigo-600">LinkedIn</a></li>
+                <li><a href="https://twitter.com/Priyank75428296" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-600">Twitter</a></li>
+                <li><a href="https://github.com/piyanka/DSAInterviewCoach" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-600">GitHub</a></li>
+                <li><a href="https://www.linkedin.com/in/priyanka-yadav-3ab194243/" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-600">LinkedIn</a></li>
               </ul>
             </div>
           </div>
