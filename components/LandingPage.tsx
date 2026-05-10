@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Brain, Search, ArrowRight, Bot, Plus } from "lucide-react";
 
 type LandingPageProps = {
   onSelectSuggestion: (label: string) => void;
@@ -20,7 +21,7 @@ export function LandingPage({ onSelectSuggestion, isLoading }: LandingPageProps)
         <nav className="mx-auto flex max-w-5xl items-center justify-between rounded-full border border-white/20 bg-white/60 px-4 py-3 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
           <div className="flex items-center gap-3 pl-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white shadow-lg shadow-indigo-500/20">
-              <span className="text-sm">🧠</span>
+              <Brain className="h-4 w-4" />
             </div>
             <span className="font-display text-sm font-black uppercase tracking-widest text-slate-900">DSA Coach</span>
           </div>
@@ -36,9 +37,7 @@ export function LandingPage({ onSelectSuggestion, isLoading }: LandingPageProps)
               className="group flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2 text-[12px] font-bold text-white transition hover:bg-indigo-600 active:scale-95"
             >
               Start Now
-              <svg className="h-3 w-3 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
+              <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
             </button>
           </div>
         </nav>
@@ -67,9 +66,7 @@ export function LandingPage({ onSelectSuggestion, isLoading }: LandingPageProps)
                   <span className="relative z-10 flex items-center gap-3">
                     Launch Mock Interview
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 backdrop-blur-md">
-                      <svg className="h-4 w-4 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                      </svg>
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                     </div>
                   </span>
                   <div className="absolute -inset-1 rounded-[28px] border-2 border-white/10 opacity-0 transition-opacity group-hover:opacity-100" />
@@ -160,7 +157,9 @@ export function LandingPage({ onSelectSuggestion, isLoading }: LandingPageProps)
                   <div className="absolute inset-0 rounded-full border-[20px] border-indigo-50" />
                   <div className="absolute inset-10 rounded-full border-[10px] border-indigo-100/50" />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="h-40 w-40 rounded-full bg-indigo-600 shadow-[0_0_80px_rgba(79,70,229,0.4)] flex items-center justify-center text-5xl">🤖</div>
+                    <div className="h-40 w-40 rounded-full bg-indigo-600 shadow-[0_0_80px_rgba(79,70,229,0.4)] flex items-center justify-center text-5xl">
+                      <Bot className="h-20 w-20 text-white" />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -186,7 +185,9 @@ export function LandingPage({ onSelectSuggestion, isLoading }: LandingPageProps)
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-16 md:flex-row md:items-center">
           <div className="space-y-4">
             <div className="flex items-center gap-2 font-display text-xl font-extrabold tracking-tighter">
-              <span className="flex h-8 w-8 items-center justify-center rounded bg-slate-900 text-[12px] text-white">🧠</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded bg-slate-900 text-white">
+                <Brain className="h-4 w-4" />
+              </span>
               <span>DSA COACH</span>
             </div>
             <p className="max-w-xs text-sm leading-relaxed text-slate-400">
@@ -240,9 +241,7 @@ function TopicCard({ title, count, level }: { title: string, count: string, leve
       <div className="mt-8 flex items-center justify-between">
         <span className="text-sm font-bold text-slate-400">{count}</span>
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-50 text-slate-400 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-          </svg>
+          <Plus className="h-5 w-5" />
         </div>
       </div>
     </div>

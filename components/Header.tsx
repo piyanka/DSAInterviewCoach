@@ -1,3 +1,5 @@
+import { Brain } from "lucide-react";
+
 type HeaderProps = {
   onReset: () => void;
   disabled?: boolean;
@@ -16,7 +18,10 @@ export function Header({
   return (
     <header className="sticky top-0 z-10 border-b border-[var(--surface-border)] bg-[var(--surface-bg)] px-4 py-3 backdrop-blur sm:px-6">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
-        <div>
+        <div className="flex items-center gap-2">
+          <div className="flex h-7 w-7 items-center justify-center rounded bg-slate-900 text-white">
+            <Brain className="h-4 w-4" />
+          </div>
           <h1 className="text-[1.02rem] font-medium tracking-[-0.04em] text-slate-900">
             DSA Interview Coach
           </h1>

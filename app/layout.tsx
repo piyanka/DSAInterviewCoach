@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "DSA Interview Coach",
   description:
     "Practice Data Structures and Algorithms interviews with an AI interviewer trained on Striver SDE Sheet questions.",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({

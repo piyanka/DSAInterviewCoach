@@ -1,3 +1,5 @@
+import { Bot } from "lucide-react";
+
 type ChatMessageProps = {
   role: "user" | "assistant" | "system";
   content: string;
@@ -40,9 +42,12 @@ export function ChatMessage({
               : "max-w-[82%] rounded-bl-md bg-white/80 text-slate-900 sm:max-w-[72%]"
         ].join(" ")}
       >
-        <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] opacity-50">
-          {isUser ? "You" : isSystem ? "System" : "Coach"}
-        </p>
+        <div className="mb-2 flex items-center gap-2">
+          {!isUser && !isSystem && <Bot className="h-3 w-3 opacity-50" />}
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-50">
+            {isUser ? "You" : isSystem ? "System" : "Coach"}
+          </p>
+        </div>
         {loading ? (
           <div className="flex items-center gap-3 text-[0.95rem]">
             <div className="flex items-center gap-1.5">
