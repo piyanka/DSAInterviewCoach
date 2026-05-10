@@ -1,13 +1,11 @@
-import Link from "next/link";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 
 export default function DocumentationPage() {
   return (
     <div className="min-h-screen bg-[#fcfcfe] font-body text-slate-900 selection:bg-indigo-600 selection:text-white">
-      <main className="mx-auto max-w-4xl px-6 py-24">
-        <Link href="/" className="mb-12 inline-flex items-center gap-2 text-sm font-bold text-indigo-600 hover:underline">
-          ← Back to Home
-        </Link>
-        
+      <Navbar />
+      <main className="mx-auto max-w-4xl px-6 py-32">
         <h1 className="font-display text-5xl font-extrabold tracking-tighter sm:text-7xl mb-8">
           Documentation
         </h1>
@@ -46,6 +44,7 @@ export default function DocumentationPage() {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
