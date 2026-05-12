@@ -66,19 +66,55 @@ The dataset lives in [/Users/priyanka/Documents/Projects/ThinklyLab/data/striver
 ```text
 /app
   /api
+    /auth
+      /[...nextauth]
+        route.ts
     /chat
       route.ts
+    /user
+      /signup
+        route.ts
+      /logout
+        route.ts
+      /profile
+        route.ts
+      /changepassword
+        route.ts
+      /forgotpassword
+        route.ts
+      /resetpassword
+        route.ts
+      /verifyemail
+        route.ts
+  /user
+    /login
+    /signup
+    /profile
+    /resetpassword
+    /forgotpassword
+    /verifyemail
   page.tsx
+
 
 /components
   ChatMessage.tsx
   ChatInput.tsx
   SuggestionButtons.tsx
   Header.tsx
+  AppToaster.tsx
+  AuthProvider.tsx
+  Navbar.tsx
 
 /data
   striverQuestions.ts
-
+/db
+  db.ts
+/helpers
+  helperFunctions.ts
+  mailer.ts
+  sessionTypes.ts
+/models
+  UserModel.ts
 /lib
   gemini.ts
 ```
@@ -102,6 +138,15 @@ cp .env.local.example .env.local
 ```bash
 GEMINI_API_KEY=your_actual_key_here
 GEMINI_MODEL=gemini-2.5-flash
+MONGO_URI=your_mongo_uri
+NEXTAUTH_URL=https://dsa-interview-coach.vercel.app/
+NEXTAUTH_SECRET=your_auth_secret
+EMAIL_USER=your_google_app_password_email
+EMAIL_PASS=your_google_app_password_code
+GOOGLE_CLIENT_ID=your_google_oauth_client_id
+GOOGLE_CLIENT_SECRET=your_google_oauth_secret
+GITHUB_CLIENT_ID=your_github_oauth_client_id
+GITHUB_CLIENT_SECRET=your_github_oauth_secret
 ```
 
 4. Start the development server:
@@ -115,11 +160,30 @@ npm run dev
 ```text
 http://localhost:3000
 ```
+## Google OAuth Setup 
+  1. Open Google Cloud Console → APIs & Services → OAuth consent screen — configure (External, add your email, save).
+  2. APIs & Services → Credentials → Create Credentials → OAuth client ID → Application type: Web application.
+  3. Set Authorized redirect URI: https://dsa-interview-coach.vercel.app/api/auth/callback/google
+  4. Create and copy the Client ID → paste into GOOGLE_CLIENT_ID and Client secret → paste into GOOGLE_CLIENT_SECRET.
+## Github OAuth Setup 
+  1. GitHub → Settings → Developer settings → OAuth Apps → New OAuth App.
+  2. Homepage URL: https://dsa-interview-coach.vercel.app
+  3. Authorization callback URL: https://dsa-interview-coach.vercel.app/api/auth/callback/github
+  4. Register app, then copy Client ID → GITHUB_CLIENT_ID and generate/copy Client Secret → GITHUB_CLIENT_SECRET.
 
 ## Environment Variables
 
 - `GEMINI_API_KEY`: your Google Generative AI API key
 - `GEMINI_MODEL`: optional Gemini model override, defaults to `gemini-2.5-flash`
+- MONGO_URI=your mongodb uri
+- NEXTAUTH_URL=https://dsa-interview-coach.vercel.app/
+- NEXTAUTH_SECRET=your_auth_secret
+- EMAIL_USER=your_google_app_password_email
+- EMAIL_PASS=your_google_app_password_code
+- GOOGLE_CLIENT_ID=your_google_oauth_client_id
+- GOOGLE_CLIENT_SECRET=your_google_oauth_secret
+- GITHUB_CLIENT_ID=your_github_oauth_client_id
+- GITHUB_CLIENT_SECRET=your_github_oauth_secret
 
 ## Deployment On Vercel
 

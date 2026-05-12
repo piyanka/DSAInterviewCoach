@@ -359,7 +359,7 @@ export default function HomePage() {
 
  return (
   <main>
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-[calc(100svh-var(--navbar-height))] flex-col">
       {messages.length > 0 ? (
         <Header
           onReset={handleReset}
