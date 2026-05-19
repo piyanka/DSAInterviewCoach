@@ -9,7 +9,6 @@ import crypto from 'crypto'
 import type { JWT } from 'next-auth/jwt'
 import type { SessionWithId } from '@/helpers/sessionTypes'
 
-connect()
 
 type UserWithId = NextAuthUser & {
   id?: string
@@ -28,11 +27,18 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null
+        await connect();
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error('Email and password are required')
+        }
         const user = await User.findOne({ email: credentials.email })
-        if (!user) return null
+        if (!user) {
+          throw new Error('Invalid email or password')
+        }
         const valid = await bcrypt.compare(credentials.password, user.password)
-        if (!valid) return null
+        if (!valid) {
+          throw new Error('Invalid email or password')
+        }
         if (!user.isVerified) {
           throw new Error('Please verify your email before signing in. Check your inbox for the verification link.')
         }
@@ -74,6 +80,7 @@ export const authOptions: NextAuthOptions = {
     },
     async signIn({ user, account, profile }: { user: NextAuthUser; account: Account | null; profile?: Profile }) {
       try {
+        await connect();
         if (account && account.provider !== 'credentials') {
           const oauthUser = user as UserWithId
           const email = user.email

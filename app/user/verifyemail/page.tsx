@@ -1,12 +1,36 @@
-"use client"
+"use client";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { toast } from "react-hot-toast";
 
 
 export default function VerifyEmail() {
+    return (
+        <Suspense fallback={<VerifyEmailFallback />}>
+            <VerifyEmailContent />
+        </Suspense>
+    );
+}
+
+function VerifyEmailFallback() {
+    return (
+        <main className="min-h-screen flex flex-col">
+            <div className="flex-1 flex items-center justify-center overflow-hidden px-6 py-16 relative">
+                <div className="relative w-full max-w-md rounded-[32px] border border-[var(--shell-border)] bg-[var(--shell-bg)] px-8 py-12 shadow-[0_28px_80px_rgba(99,102,241,0.14)] backdrop-blur-xl">
+                    <div className="text-center mb-8">
+                        <div className="text-4xl leading-none mb-4">✉️</div>
+                        <h1 className="text-3xl font-bold tracking-[-0.06em] text-slate-900">Verify Email</h1>
+                        <p className="mt-2 text-sm text-slate-500">Loading verification status...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    );
+}
+
+function VerifyEmailContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [token, setToken] = useState("");

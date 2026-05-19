@@ -3,10 +3,34 @@
 import axios from "axios";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
 export default function ResetPasswordPage() {
+    return (
+        <Suspense fallback={<ResetPasswordFallback />}>
+            <ResetPasswordForm />
+        </Suspense>
+    );
+}
+
+function ResetPasswordFallback() {
+    return (
+        <main className="min-h-[calc(100svh-var(--navbar-height))] flex flex-col">
+            <div className="flex-1 flex items-center justify-center px-6 py-6 sm:py-8">
+                <div className="w-full max-w-md rounded-[32px] border border-[var(--shell-border)] bg-[var(--shell-bg)] px-8 py-12 shadow-[0_28px_80px_rgba(99,102,241,0.14)] backdrop-blur-xl">
+                    <div className="text-center">
+                        <div className="text-4xl leading-none mb-4">🛡️</div>
+                        <h1 className="text-3xl font-bold tracking-[-0.06em] text-slate-900">Set a new password</h1>
+                        <p className="mt-2 text-sm text-slate-500">Loading reset link...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    );
+}
+
+function ResetPasswordForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [token, setToken] = useState("");
