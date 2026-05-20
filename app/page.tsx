@@ -259,19 +259,33 @@ export default function HomePage() {
         })
       });
 
-      const contentType = response.headers.get("content-type") || "";
       const payloadText = await response.text();
-
-      if (!contentType.includes("application/json")) {
-        throw new Error("The server returned an unexpected response. Please restart the app and try again.");
-      }
-
-      const data = JSON.parse(payloadText) as {
+      let data: {
         reply?: string;
         error?: string;
         question?: StriverQuestion | null;
         interviewState?: InterviewState | null;
-      };
+      } | null = null;
+
+      try {
+        data = JSON.parse(payloadText) as typeof data;
+      } catch {
+        data = null;
+      }
+
+      if (!data) {
+        if (!response.ok) {
+          const fallbackError = payloadText.trim();
+          throw new Error(
+            fallbackError ||
+              "The server returned an unexpected response. Please try again."
+          );
+        }
+
+        throw new Error(
+          "The server returned an unexpected response. Please restart the app and try again."
+        );
+      }
 
       const replyText = data.reply;
 
