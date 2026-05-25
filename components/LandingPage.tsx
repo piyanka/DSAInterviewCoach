@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import React from "react";
+import { Footer } from "./Footer";
 
 type LandingPageProps = {
   onSelectSuggestion: (label: string) => void;
@@ -8,18 +9,6 @@ type LandingPageProps = {
 };
 
 export function LandingPage({ onSelectSuggestion, isLoading }: LandingPageProps) {
-  useEffect(() => {
-    const handleStartInterview = () => {
-      onSelectSuggestion("Let's start a mock interview");
-    };
-
-    window.addEventListener('landingpage:start-interview', handleStartInterview);
-
-    return () => {
-      window.removeEventListener('landingpage:start-interview', handleStartInterview);
-    };
-  }, [onSelectSuggestion]);
-
   return (
     <div className="relative flex min-h-screen flex-col bg-[#fcfcfe] font-body text-slate-900 selection:bg-indigo-600 selection:text-white">
       {/* GRID OVERLAY - THE DEBUG GRID */}
@@ -27,7 +16,36 @@ export function LandingPage({ onSelectSuggestion, isLoading }: LandingPageProps)
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] [background-size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
       </div>
 
-      <main className="relative z-10 flex-1 pt-20">
+      {/* HEADER */}
+      <header className="fixed top-6 left-0 right-0 z-50 px-6">
+        <nav className="mx-auto flex max-w-5xl items-center justify-between rounded-full border border-white/20 bg-white/60 px-4 py-3 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
+          <div className="flex items-center gap-3 pl-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white shadow-lg shadow-indigo-500/20">
+              <span className="text-sm">🧠</span>
+            </div>
+            <span className="font-display text-sm font-black uppercase tracking-widest text-slate-900">DSA Coach</span>
+          </div>
+          
+          <div className="flex items-center gap-1">
+            <div className="hidden items-center gap-2 px-6 text-[11px] font-black uppercase tracking-widest text-slate-400 md:flex">
+              <a href="#challenge" className="px-3 py-2 transition hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Problem</a>
+              <a href="#curriculum" className="px-3 py-2 transition hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Curriculum</a>
+              <a href="#specs" className="px-3 py-2 transition hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Specs</a>
+            </div>
+            <button 
+              onClick={() => onSelectSuggestion("Start Interview")}
+              className="group flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2 text-[12px] font-bold text-white transition hover:bg-indigo-600 active:scale-95"
+            >
+              Start Now
+              <svg className="h-3 w-3 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </button>
+          </div>
+        </nav>
+      </header>
+
+      <main className="relative z-10 flex-1">
         {/* HERO SECTION - INDUSTRIAL MINIMAL */}
         <section className="mx-auto max-w-7xl px-6 pb-24 pt-20 md:px-12 md:pt-32">
           <div className="relative">
@@ -164,49 +182,7 @@ export function LandingPage({ onSelectSuggestion, isLoading }: LandingPageProps)
         </section>
       </main>
 
-      {/* FOOTER - REFINED */}
-      <footer className="border-t border-slate-100 bg-white px-6 py-20 md:px-12">
-        <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-16 md:flex-row md:items-center">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 font-display text-xl font-extrabold tracking-tighter">
-              <span className="flex h-8 w-8 items-center justify-center rounded bg-slate-900 text-[12px] text-white">🧠</span>
-              <span>DSA COACH</span>
-            </div>
-            <p className="max-w-xs text-sm leading-relaxed text-slate-400">
-              The world's first industrial-grade AI interview coach for software engineers.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-12 sm:grid-cols-3">
-            <div className="space-y-4">
-              <h4 className="text-xs font-black uppercase tracking-widest text-slate-900">Platform</h4>
-              <ul className="space-y-2 text-sm font-semibold text-slate-500">
-                <li><a href="#" className="hover:text-indigo-600">Pricing</a></li>
-                <li><a href="#" className="hover:text-indigo-600">Curriculum</a></li>
-                <li><a href="#" className="hover:text-indigo-600">API</a></li>
-              </ul>
-            </div>
-            <div className="space-y-4">
-              <h4 className="text-xs font-black uppercase tracking-widest text-slate-900">Resources</h4>
-              <ul className="space-y-2 text-sm font-semibold text-slate-500">
-                <li><a href="#" className="hover:text-indigo-600">Documentation</a></li>
-                <li><a href="#" className="hover:text-indigo-600">SDE Sheet</a></li>
-                <li><a href="#" className="hover:text-indigo-600">Blog</a></li>
-              </ul>
-            </div>
-            <div className="space-y-4">
-              <h4 className="text-xs font-black uppercase tracking-widest text-slate-900">Social</h4>
-              <ul className="space-y-2 text-sm font-semibold text-slate-500">
-                <li><a href="#" className="hover:text-indigo-600">Twitter</a></li>
-                <li><a href="#" className="hover:text-indigo-600">GitHub</a></li>
-                <li><a href="#" className="hover:text-indigo-600">LinkedIn</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div className="mx-auto mt-20 max-w-7xl border-t border-slate-50 pt-10 text-center text-xs font-bold uppercase tracking-widest text-slate-300">
-          © {new Date().getFullYear()} DSA Interview Coach.
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
