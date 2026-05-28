@@ -17,6 +17,12 @@ type InterviewState = {
   hintsUsed: number;
 };
 
+type InterviewDecision = {
+  reply: string;
+  stageVerdict: "stay" | "advance" | "solution";
+  hintApplied?: boolean;
+};
+
 type ChatRequestBody = {
   message: string;
   mode: "mockInterview" | "normalChat";
@@ -58,7 +64,7 @@ function buildMockInterviewPrompt(
 
   const stageInstructions: Record<InterviewStage, string> = {
     approach:
-      "The candidate is still explaining the high-level approach. Evaluate the approach and either ask one focused clarifying question or move to time complexity if the approach is sufficient.",
+      "The candidate is still explaining the high-level approach. Evaluate whether their approach is actually sufficient before moving on.",
     timeComplexity:
       "The candidate has already explained the approach. Ask specifically about time complexity and react to their answer.",
     spaceComplexity:
@@ -90,6 +96,7 @@ Rules:
 - Ask follow-up questions.
 - Behave like a real interviewer.
 - Base your feedback on the user's actual response.
+- Decide stage progression from the quality of the user's latest answer, not from the intent label.
 - Keep the reply concise and interview-focused.
 - Do not skip directly to the solution unless the user explicitly asks for it.
 - Sound like a human interviewer speaking naturally in a live conversation.
@@ -115,6 +122,20 @@ Rules:
   ...
   \`\`\`
   Then add one short plain-English explanation.
+
+Return valid JSON only with this shape:
+{
+  "reply": string,
+  "stageVerdict": "stay" | "advance" | "solution",
+  "hintApplied": boolean
+}
+
+Stage rules:
+- Set stageVerdict to "advance" only if the user's latest answer truly satisfies the current stage.
+- If the answer is incomplete, incorrect, or insufficient, set stageVerdict to "stay" even if the message sounds like a normal continuation.
+- Set stageVerdict to "solution" only when the user explicitly asks for the solution.
+- Set hintApplied to true only when you actually provide a hint.
+- Keep reply natural and interview-like, and make sure reply does not mention the JSON format.
 
 Conversation so far:
 ${conversation || "No previous conversation."}
@@ -180,6 +201,38 @@ function sanitizeAiReply(reply: string) {
     .trim();
 }
 
+function extractInterviewDecision(rawResponse: string): InterviewDecision | null {
+  const trimmedResponse = rawResponse.trim();
+  const fencedJsonMatch = trimmedResponse.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const jsonCandidate = (fencedJsonMatch?.[1] ?? trimmedResponse).trim();
+  const startIndex = jsonCandidate.indexOf("{");
+  const endIndex = jsonCandidate.lastIndexOf("}");
+  const payload =
+    startIndex >= 0 && endIndex >= startIndex
+      ? jsonCandidate.slice(startIndex, endIndex + 1)
+      : jsonCandidate;
+
+  try {
+    const parsed = JSON.parse(payload) as Partial<InterviewDecision>;
+    if (
+      typeof parsed.reply === "string" &&
+      (parsed.stageVerdict === "stay" ||
+        parsed.stageVerdict === "advance" ||
+        parsed.stageVerdict === "solution")
+    ) {
+      return {
+        reply: parsed.reply,
+        stageVerdict: parsed.stageVerdict,
+        hintApplied: parsed.hintApplied === true
+      };
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
 function isHintRequest(message: string) {
   return /\b(hint|stuck|help|clue|nudge|struggling|dont know|don't know)\b/i.test(message);
 }
@@ -190,12 +243,12 @@ function isSolutionRequest(message: string) {
   );
 }
 
-function getNextStage(stage: InterviewStage, intent: "hint" | "solution" | "continue") {
-  if (intent === "solution") {
+function getNextStage(stage: InterviewStage, verdict: InterviewDecision["stageVerdict"]) {
+  if (verdict === "solution") {
     return "solution" as const;
   }
 
-  if (intent === "hint") {
+  if (verdict !== "advance") {
     return stage;
   }
 
@@ -277,16 +330,18 @@ export async function POST(request: Request) {
         : buildNormalChatPrompt(message, selectedTopic, normalizedHistory);
 
     const result = await model.generateContent(prompt);
-    const aiText = sanitizeAiReply(result.response.text());
+    const rawAiText = result.response.text();
+    const decision = mode === "mockInterview" ? extractInterviewDecision(rawAiText) : null;
+    const aiText = sanitizeAiReply(decision?.reply ?? rawAiText);
     const nextInterviewState =
       mode === "mockInterview"
         ? {
             stage:
               intent === "start"
                 ? activeInterviewState.stage
-                : getNextStage(activeInterviewState.stage, intent),
+                : getNextStage(activeInterviewState.stage, decision?.stageVerdict ?? "stay"),
             hintsUsed:
-              intent === "hint"
+              decision?.hintApplied
                 ? activeInterviewState.hintsUsed + 1
                 : activeInterviewState.hintsUsed
           }
